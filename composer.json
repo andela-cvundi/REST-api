@@ -1,6 +1,7 @@
 {
     "require": {
         "slim/slim": "~2.0",
-        "vlucas/phpdotenv": "^2.2"
+        "vlucas/phpdotenv": "^2.2",
+        "vundi/potato-orm": "^1.0"
     }
 }
