@@ -3,6 +3,7 @@
 require 'vendor/autoload.php';
 use Slim\Slim;
 use Vundi\Potato\Model;
+use Exceptions\ResourceNotFound;
 
 class myAPI extends Model
 {
@@ -18,8 +19,11 @@ class myAPI extends Model
 
     public function enable()
     {
-
         $this->app->get('/', function () {
+            echo "Welcome to the homepage of my API service";
+        });
+
+        $this->app->get('/people', function () {
             // query database for all articles
             $people = self::findAll();
 
@@ -30,14 +34,27 @@ class myAPI extends Model
             echo json_encode($people);
         });
 
-        $this->app->get('/:id', function ($id) {
-            $id = (int)$id;
-            $person = self::find($id);
-            $this->app->response()->header('Content-Type', 'application/json');
+        $this->app->get('/person/:id', function ($id) {
+            try {
+                $id = (int)$id;
+                $person = self::find($id);
+                if (is_object($person)) {
+                    $this->app->response()->header('Content-Type', 'application/json');
+                    // return JSON-encoded response body with query results
+                    echo json_encode($person);
+                } else {
+                    throw new ResourceNotFound();
+                }
+            } catch (ResourceNotFound $e) {
+                echo $this->app->response()->status(404);
+            } catch (Exception $e) {
+                echo $this->app->response()->status(400);
+                echo $this->app->response()->header('X-Status-Reason', $e->getMessage());
+            }
 
-            // return JSON-encoded response body with query results
-            echo json_encode($person);
         });
+
+
 
         $this->app->post('/person', function () {
             $request = $this->app->request();
