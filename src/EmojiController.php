@@ -21,6 +21,16 @@ class EmojiController
         return $emoji;
     }
 
+    public static function newEmoji($data)
+    {
+        $emoji = new Emoji();
+        $emoji->FName = $data['FName'];
+        $emoji->LName = $data['LName'];
+        $emoji->Gender = $data['Gender'];
+        $emoji->Age = $data['Age'];
+        $emoji->save();
+    }
+
     public static function delete($id)
     {
         try {

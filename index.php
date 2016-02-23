@@ -32,22 +32,18 @@ $app->get('/person/:id', function ($id) use ($app) {
 
 // Create an Emoji.
 $app->post('/person', function () use ($app) {
-    try {
-        $request = $app->request();
-        $body = $request->post();
+    $data = $app->request->post();
 
-        $person = new Emoji();
-        $person->FName = $body['FName'];
-        $person->LName = $body['LName'];
-        $person->Age = $body['Age'];
-        $person->Gender = $body['Gender'];
-        $person->save();
-        $app->response()->headers('Content-Type', 'application/json');
-        echo json_encode($person->db_fields);
-    } catch (Exception $e) {
-        echo $app->response()->status(400);
-        echo $app->response()->header('X-Status-Reason', $e->getMessage());
-    }
+    EmojiController::newEmoji($data);
+    $app->response->headers('Content-type', 'application/json');
+    $app->response->status(201);
+    $message = [
+        'success' => true,
+        'message' => 'Emoji successfully created',
+    ];
+    $json = json_encode($message);
+    echo $json;
+
 });
 
 
