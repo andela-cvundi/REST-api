@@ -1,6 +1,6 @@
 <?php
 
-namespace Vundi\EmojiApi;
+namespace Vundi\EmojiApi\Models;
 
 use Vundi\Potato\Model;
 

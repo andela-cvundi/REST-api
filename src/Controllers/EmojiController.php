@@ -1,8 +1,8 @@
 <?php
 
-namespace Vundi\EmojiApi;
+namespace Vundi\EmojiApi\Controllers;
 
-use Vundi\EmojiApi\Emoji;
+use Vundi\EmojiApi\Models\Emoji;
 
 class EmojiController
 {

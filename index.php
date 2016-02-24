@@ -3,8 +3,8 @@
 require 'vendor/autoload.php';
 
 use Slim\Slim;
-use Vundi\EmojiApi\EmojiController;
-use Vundi\EmojiApi\Emoji;
+use Vundi\EmojiApi\Controllers\EmojiController;
+use Vundi\EmojiApi\Models\Emoji;
 use Vundi\Potato\Exceptions\NonExistentID;
 
 $app = new Slim();
@@ -56,10 +56,8 @@ $app->put('/person/:id', function ($id) use ($app) {
     $app->response->status(201);
     $message = [
         'success' => true,
-        'message' => 'Emoji successfully created',
+        'message' => 'Emoji successfully updated',
     ];
-
-    $json = json_encode($message);
 
     $emoji = EmojiController::find($id)->db_fields;
 
@@ -68,20 +66,42 @@ $app->put('/person/:id', function ($id) use ($app) {
 });
 
 // Partially update an emoji with ID.
-$app->patch('/:id', function ($id) use ($app) {
-    $data = $app->request->patch();
+$app->patch('/person/:id', function ($id) use ($app) {
     $id = (int)$id;
-    $emoji = EmojiController::updateEmoji($id, $data);
-    if (empty($emoji)) {
-        $app->response->setStatus(304);
-        $app->response->body(
-            '{"error" : "Not Modified."}'
-        );
-        return $app->response();
+    $emoji = Emoji::find($id);
+    foreach ($app->request->patch() as $key => $value) {
+        $emoji->{$key} = $value;
     }
-    $app->response->body($emoji);
-    return $app->response();
+
+    $patch = $emoji->update();
+    if ($patch) {
+        $message = [
+            'success' => true,
+            'message' => 'Emoji updated partially',
+        ];
+        $app->response->status(201);
+    } else {
+        $message = [
+            'success' => false,
+            'message' => 'Emoji not partially updated',
+        ];
+        $app->response->status(304);
+    }
+    $emoji = EmojiController::find($id)->db_fields;
+
+    $json = json_encode($emoji);
+    echo $json;
+});
+
+$app->delete('/person/:id', function ($id) use ($app) {
+    $app->response()->header("Content-Type", "application/json");
+    $id = (int)$id;
+    Emoji::remove($id);
+    echo json_encode(array(
+        "status" => true,
+        "message" => "Person deleted successfully"
+    ));
 });
 
 
-    $app->run();
+$app->run();
