@@ -48,18 +48,40 @@ $app->post('/person', function () use ($app) {
 
 
 $app->put('/person/:id', function ($id) use ($app) {
+    $data = $app->request->put();
     $id = (int)$id;
-    $person = Emoji::find($id);
-    $request = $app->request();
-    $body = $request->put();
-    $person->FName = $body['FName'];
-    $person->LName = $body['LName'];
-    $person->Age = $body['Age'];
-    $person->Gender = $body['Gender'];
-    $person->update();
-    $app->response()->header('Content-Type', 'application/json');
-    echo json_encode($person->db_fields);
+    EmojiController::updateEmoji($id, $data);
+
+    $app->response->headers('Content-type', 'application/json');
+    $app->response->status(201);
+    $message = [
+        'success' => true,
+        'message' => 'Emoji successfully created',
+    ];
+
+    $json = json_encode($message);
+
+    $emoji = EmojiController::find($id)->db_fields;
+
+    $json = json_encode($emoji);
+    echo $json;
+});
+
+// Partially update an emoji with ID.
+$app->patch('/:id', function ($id) use ($app) {
+    $data = $app->request->patch();
+    $id = (int)$id;
+    $emoji = EmojiController::updateEmoji($id, $data);
+    if (empty($emoji)) {
+        $app->response->setStatus(304);
+        $app->response->body(
+            '{"error" : "Not Modified."}'
+        );
+        return $app->response();
+    }
+    $app->response->body($emoji);
+    return $app->response();
 });
 
 
-$app->run();
+    $app->run();
