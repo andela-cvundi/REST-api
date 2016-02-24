@@ -31,6 +31,17 @@ class EmojiController
         $emoji->save();
     }
 
+
+    public static function updateEmoji($id, $data)
+    {
+        $emoji = Emoji::find($id);
+        $emoji->FName = $data['FName'];
+        $emoji->LName = $data['LName'];
+        $emoji->Gender = $data['Gender'];
+        $emoji->Age = $data['Age'];
+        $emoji->update();
+    }
+
     public static function delete($id)
     {
         try {
